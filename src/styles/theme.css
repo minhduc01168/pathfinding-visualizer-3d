@@ -1,0 +1,102 @@
+:root {
+  --font-main: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* =========================================
+     THEME: CYBER AURORA (VIBRANT DARK)
+     ========================================= */
+  --bg-darker: #0b0f19;
+  --bg-dark: #111827;
+  --bg-surface: #1e293b;
+  --bg-card: rgba(30, 41, 59, 0.75);
+  --bg-card-hover: rgba(51, 65, 85, 0.85);
+  --bg-overlay: rgba(11, 15, 25, 0.92);
+
+  /* Borders & Glassmorphism */
+  --border-subtle: rgba(255, 255, 255, 0.12);
+  --border-glow: rgba(56, 189, 248, 0.5);
+  --glass-blur: blur(16px);
+
+  /* Vibrant Neon Accents */
+  --neon-cyan: #00f2fe;
+  --neon-blue: #38bdf8;
+  --neon-purple: #c084fc;
+  --neon-gold: #fbbf24;
+  --neon-emerald: #10b981;
+  --neon-rose: #f43f5e;
+  --neon-coral: #fb7185;
+
+  /* Terrain Palette - Vibrant & Luminous */
+  --cell-empty-bg: #1e293b;
+  --cell-empty-border: rgba(255, 255, 255, 0.06);
+  --cell-wall-bg: #475569;
+  --cell-wall-border: #94a3b8;
+  --cell-mud-bg: #b45309;
+  --cell-mud-border: #f59e0b;
+  --cell-water-bg: #0284c7;
+  --cell-water-border: #38bdf8;
+  --cell-start-bg: #10b981;
+  --cell-end-bg: #f43f5e;
+
+  /* Wavefront & Path Glowing Traces */
+  --wave-visited-base: rgba(99, 102, 241, 0.45);
+  --wave-visited-glow: #818cf8;
+  --path-gold: #fbbf24;
+  --path-glow: rgba(251, 191, 36, 0.7);
+
+  /* Algorithm Branding */
+  --bfs-color: #06b6d4;
+  --dijkstra-color: #3b82f6;
+  --astar-color: #f59e0b;
+
+  /* Text Colors */
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+
+  /* Shadows & Glow */
+  --glow-cyan: 0 0 20px rgba(6, 182, 212, 0.45);
+  --glow-gold: 0 0 24px rgba(245, 158, 11, 0.5);
+  --glow-rose: 0 0 20px rgba(244, 63, 94, 0.45);
+  --shadow-card: 0 10px 30px -5px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1);
+
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.25s ease;
+}
+
+/* =========================================
+   LIGHT THEME: CRISP TECH LAB (MODERN LIGHT)
+   ========================================= */
+body.light-theme {
+  --bg-darker: #f1f5f9;
+  --bg-dark: #ffffff;
+  --bg-surface: #e2e8f0;
+  --bg-card: rgba(255, 255, 255, 0.85);
+  --bg-card-hover: rgba(255, 255, 255, 0.95);
+  --bg-overlay: rgba(241, 245, 249, 0.94);
+
+  --border-subtle: rgba(0, 0, 0, 0.1);
+  --border-glow: rgba(14, 165, 233, 0.6);
+
+  --cell-empty-bg: #f8fafc;
+  --cell-empty-border: rgba(0, 0, 0, 0.08);
+  --cell-wall-bg: #334155;
+  --cell-wall-border: #1e293b;
+  --cell-mud-bg: #d97706;
+  --cell-mud-border: #92400e;
+  --cell-water-bg: #0284c7;
+  --cell-water-border: #0369a1;
+  --cell-start-bg: #059669;
+  --cell-end-bg: #e11d48;
+
+  --wave-visited-base: rgba(99, 102, 241, 0.3);
+  --wave-visited-glow: #6366f1;
+  --path-gold: #d97706;
+  --path-glow: rgba(217, 119, 6, 0.5);
+
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --text-muted: #64748b;
+
+  --shadow-card: 0 10px 25px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+}
