@@ -23,8 +23,6 @@
 - [📂 Cấu Trúc Thư Mục](#-cấu-trúc-thư-mục)
 - [⚡ Hướng Dẫn Cài Đặt & Chạy Dự Án](#-hướng-dẫn-cài-đặt--chạy-dự-án)
 - [🎮 Hướng Dẫn Phím Điều Khiển](#-hướng-dẫn-phím-điều-khiển)
-- [📚 Tài Liệu Kỹ Thuật Chuyên Sâu](#-tài-liệu-kỹ-thuật-chuyên-sâu)
-- [🔒 Quy Chuẩn Đẩy Lên GitHub](#-quy-chuẩn-đẩy-lên-github)
 - [📄 Giấy Phép (License)](#-giấy-phép-license)
 
 ---
@@ -221,46 +219,6 @@ pathquest-2d-3d/
 * **`W`, `A`, `S`, `D`** hoặc **`▲`, `▼`, `◄`, `►`**: Di chuyển nhân vật Runner theo 4 hướng.
 * **`SPACE` (Phím cách)**: Giăng bẫy bùn lầy ngay tại vị trí hiện tại (Tối đa 5 bẫy) để chặn đường và ép AI đổi hướng.
 * **Nút "Chơi lại Game"**: Tạo ngẫu nhiên một đấu trường mới và bắt đầu màn chơi.
-
----
-
-## 📚 Tài Liệu Kỹ Thuật Chuyên Sâu
-
-Hệ thống có bộ tài liệu kỹ thuật chi tiết nằm trong thư mục [`docs/`](docs/):
-
-1. 📘 [**01_SYSTEM_ARCHITECTURE.md**](docs/01_SYSTEM_ARCHITECTURE.md): Phân tích chi tiết 4 tầng kiến trúc, sơ đồ luồng dữ liệu, cơ chế quản lý trạng thái và thiết kế đồ họa 2D/3D.
-2. 📗 [**02_ALGORITHMS_AND_BENCHMARKS.md**](docs/02_ALGORITHMS_AND_BENCHMARKS.md): Phân tích lý thuyết chuyên sâu về BFS, Dijkstra, A*, hàm Heuristic Manhattan và bảng số liệu đối sánh thực nghiệm trên các kịch bản bản đồ.
-3. 📙 [**03_USER_AND_GAME_GUIDE.md**](docs/03_USER_AND_GAME_GUIDE.md): Cẩm nang hướng dẫn sử dụng chi tiết cho người dùng cuối và chiến thuật sinh tồn trong Arcade Arena 3D.
-4. 📕 [**04_TECHNICAL_SPECS_AND_API.md**](docs/04_TECHNICAL_SPECS_AND_API.md): Đặc tả cấu trúc dữ liệu, Interfaces TypeScript, giải thích các hàm API và chỉ số hiệu năng (DPI Scaling, MinHeap optimization).
-
----
-
-## 🔒 Quy Chuẩn Đẩy Lên GitHub
-
-Kho lưu trữ đã được cấu hình tệp [`.gitignore`](.gitignore) để loại trừ toàn bộ các thư mục nội bộ, tệp tạm và cấu hình máy phát triển:
-* ⛔ `node_modules/` (Thư viện phụ thuộc npm)
-* ⛔ `dist/` (Thư mục xuất bản build)
-* ⛔ `_bmad/`, `.agent/`, `.agents/` (Các thư mục cấu hình AI agent nội bộ)
-* ⛔ `.env`, `.env.*` (Biến môi trường)
-* ⛔ `.vscode/`, `.idea/` (Cấu hình riêng của IDE)
-
-### Lệnh Khởi Tạo & Đẩy Lên Kho Chứa Từ Xa (Remote Repository)
-```bash
-# 1. Khởi tạo kho Git cục bộ (nếu chưa có)
-git init -b main
-
-# 2. Thêm tất cả các tệp hợp lệ (đã được lọc qua .gitignore)
-git add .
-
-# 3. Tạo commit đầu tiên
-git commit -m "feat: initial commit for PathQuest 2D/3D Pro Edition"
-
-# 4. Gắn liên kết tới kho GitHub của bạn
-git remote add origin https://github.com/<your-username>/<your-repo-name>.git
-
-# 5. Đẩy nhánh mã nguồn chính lên GitHub
-git push -u origin main
-```
 
 ---
 
