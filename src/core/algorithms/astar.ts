@@ -101,7 +101,7 @@ export function runAStar(
     shortestPath,
     metrics: {
       algorithm: 'astar',
-      name: 'A* Search (Manhattan Heuristic)',
+      name: 'Thuật toán A*',
       executionTimeMs,
       visitedNodesCount: visitedOrder.length,
       pathLength: shortestPath.length,

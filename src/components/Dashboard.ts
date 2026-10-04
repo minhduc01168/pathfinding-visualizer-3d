@@ -33,7 +33,7 @@ export class Dashboard {
         <div class="metric-card ${type}-card">
           <div class="card-header">
             <span class="algo-tag ${type}-tag">${type.toUpperCase()}</span>
-            <span class="status-badge idle">Ready</span>
+            <span class="status-badge idle">Sẵn sàng</span>
           </div>
           <div class="card-body">
             <p class="placeholder-text">Chưa chạy mô phỏng</p>
@@ -69,7 +69,7 @@ export class Dashboard {
             <span class="stat-value">${m.pathLength} <small>bước</small></span>
           </div>
           <div class="stat-item">
-            <span class="stat-label">Tổng chi phí (Cost)</span>
+            <span class="stat-label">Tổng chi phí</span>
             <span class="stat-value cost">${m.pathCost}</span>
           </div>
         </div>
@@ -87,7 +87,7 @@ export class Dashboard {
       return `
         <div class="verdict-placeholder">
           <span class="verdict-icon">💡</span>
-          <span>Bấm <strong>"Chạy Đua (Race All)"</strong> để hệ thống tự động đối chiếu và xuất kết luận khoa học.</span>
+          <span>Bấm <strong>"CHẠY ĐUA TẤT CẢ"</strong> để hệ thống tự động đối chiếu và xuất kết luận khoa học.</span>
         </div>
       `;
     }
@@ -133,7 +133,7 @@ export class Dashboard {
       <div class="verdict-content">
         <div class="verdict-header">
           <span class="trophy-badge">🏆 Báo Cáo Phân Tích Khoa Học</span>
-          <span class="champ-tag">Tối ưu nhất: A* (A-Star)</span>
+          <span class="champ-tag">Tối ưu nhất: Thuật toán A*</span>
         </div>
         <ul class="verdict-insights">
           ${analysisPoints.join('')}

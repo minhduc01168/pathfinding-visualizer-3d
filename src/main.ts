@@ -19,6 +19,8 @@ let startCoord: GridCoord = { r: 5, c: 5 };
 let endCoord: GridCoord = { r: 15, c: 29 };
 let activeBrush: BrushMode = 'wall';
 let currentSpeedMultiplier = 2.5;
+export type ComparisonViewMode = 'all' | 'bfs' | 'dijkstra' | 'astar';
+let currentViewMode: ComparisonViewMode = 'all';
 
 // Component Instances
 let masterCanvas: GridCanvas2D;
@@ -79,6 +81,37 @@ function initGridData(r: number, c: number): void {
 function syncAllCanvases(): void {
   masterCanvas.render(grid, startCoord, endCoord);
   triSplitView.renderAll(grid, startCoord, endCoord);
+  updateMapStats();
+}
+
+function updateMapStats(): void {
+  const elDim = document.getElementById('stat-dim');
+  const elStart = document.getElementById('stat-start');
+  const elEnd = document.getElementById('stat-end');
+  const elWalls = document.getElementById('stat-walls');
+  const elMud = document.getElementById('stat-mud');
+  const elWater = document.getElementById('stat-water');
+
+  if (elDim) elDim.textContent = `${cols} × ${rows}`;
+  if (elStart) elStart.textContent = `(${startCoord.r}, ${startCoord.c})`;
+  if (elEnd) elEnd.textContent = `(${endCoord.r}, ${endCoord.c})`;
+
+  let wallCount = 0;
+  let mudCount = 0;
+  let waterCount = 0;
+
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      const type = grid[r][c];
+      if (type === NodeType.WALL) wallCount++;
+      else if (type === NodeType.MUD) mudCount++;
+      else if (type === NodeType.WATER) waterCount++;
+    }
+  }
+
+  if (elWalls) elWalls.textContent = wallCount.toString();
+  if (elMud) elMud.textContent = mudCount.toString();
+  if (elWater) elWater.textContent = waterCount.toString();
 }
 
 function handleMasterCellPaint(r: number, c: number): void {
@@ -107,20 +140,35 @@ function handleMasterCellPaint(r: number, c: number): void {
 }
 
 function attachControls(): void {
-  // Theme Switcher (Dark / Light)
+  // Theme Switcher (Bright STEM Lab by default, Dark Cyber Aurora as secondary)
   const btnThemeToggle = document.getElementById('btn-theme-toggle') as HTMLButtonElement;
   const themeIcon = document.getElementById('theme-icon') as HTMLElement;
   const themeText = document.getElementById('theme-text') as HTMLElement;
 
+  // Initialize theme from localStorage (default is bright/light)
+  const savedTheme = localStorage.getItem('pathquest_theme');
+  if (savedTheme === 'dark') {
+    document.body.classList.add('dark-theme');
+    if (themeIcon) themeIcon.textContent = '☀️';
+    if (themeText) themeText.textContent = 'Chế Độ Sáng';
+  } else {
+    document.body.classList.remove('dark-theme');
+    if (themeIcon) themeIcon.textContent = '🌙';
+    if (themeText) themeText.textContent = 'Chế Độ Tối';
+  }
+
   btnThemeToggle?.addEventListener('click', () => {
-    const isLight = document.body.classList.toggle('light-theme');
-    if (isLight) {
-      themeIcon.textContent = '🌙';
-      themeText.textContent = 'Chế Độ Tối';
-    } else {
+    const isDark = document.body.classList.toggle('dark-theme');
+    if (isDark) {
       themeIcon.textContent = '☀️';
       themeText.textContent = 'Chế Độ Sáng';
+      localStorage.setItem('pathquest_theme', 'dark');
+    } else {
+      themeIcon.textContent = '🌙';
+      themeText.textContent = 'Chế Độ Tối';
+      localStorage.setItem('pathquest_theme', 'light');
     }
+    gameEngine?.updateTheme(!isDark);
     syncAllCanvases();
   });
 
@@ -154,7 +202,28 @@ function attachControls(): void {
     if (!gameEngine) {
       gameEngine = new GameEngine3D(arena3DContainer, updateArcadeHUD);
     }
+    const isLight = !document.body.classList.contains('dark-theme');
+    gameEngine.updateTheme(isLight);
     gameEngine.initGame(21, 27);
+    setTimeout(() => {
+      gameEngine?.onResize();
+    }, 50);
+  });
+
+  // Arcade Restart & Camera Reset Buttons
+  const btnArcadeRestart = document.getElementById('btn-arcade-restart') as HTMLButtonElement;
+  btnArcadeRestart?.addEventListener('click', () => {
+    if (gameEngine) {
+      const isLight = !document.body.classList.contains('dark-theme');
+      gameEngine.updateTheme(isLight);
+      gameEngine.initGame(21, 27);
+      gameEngine.onResize();
+    }
+  });
+
+  const btnArcadeCamReset = document.getElementById('btn-arcade-camera-reset') as HTMLButtonElement;
+  btnArcadeCamReset?.addEventListener('click', () => {
+    gameEngine?.resetCamera();
   });
 
   // Brush Buttons
@@ -229,7 +298,7 @@ function attachControls(): void {
       {
         onComplete: (results) => {
           btnRace.disabled = false;
-          btnRace.innerHTML = `<span>▶</span> Chạy Đua (Race All)`;
+          btnRace.innerHTML = `<span>▶</span> CHẠY ĐUA TẤT CẢ`;
 
           const bfsRes = results.get('bfs');
           const dijRes = results.get('dijkstra');
@@ -237,17 +306,17 @@ function attachControls(): void {
 
           updateStatusBadge(
             'bfs-status',
-            bfsRes?.metrics.found ? 'Lưu vết thành công' : 'Bế tắc',
+            bfsRes?.metrics.found ? 'Hoàn thành' : 'Bế tắc',
             bfsRes?.metrics.found ? 'success' : 'failed'
           );
           updateStatusBadge(
             'dijkstra-status',
-            dijRes?.metrics.found ? 'Lưu vết thành công' : 'Bế tắc',
+            dijRes?.metrics.found ? 'Hoàn thành' : 'Bế tắc',
             dijRes?.metrics.found ? 'success' : 'failed'
           );
           updateStatusBadge(
             'astar-status',
-            astarRes?.metrics.found ? 'Lưu vết thành công' : 'Bế tắc',
+            astarRes?.metrics.found ? 'Hoàn thành' : 'Bế tắc',
             astarRes?.metrics.found ? 'success' : 'failed'
           );
 
@@ -332,6 +401,106 @@ function attachControls(): void {
   });
   document.getElementById('btn-overlay-action')?.addEventListener('click', () => {
     gameEngine?.initGame(21, 27);
+  });
+
+  // View Mode Switcher: Tri-Split (Xem cả 3) vs Phóng to (BFS, Dijkstra, A*)
+  const viewTabs = document.querySelectorAll<HTMLButtonElement>('.view-tab-btn');
+  viewTabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+      const targetView = tab.getAttribute('data-view') as ComparisonViewMode;
+      if (targetView) {
+        setComparisonViewMode(targetView);
+      }
+    });
+  });
+
+  // Per-card Zoom Buttons
+  const zoomBtns = document.querySelectorAll<HTMLButtonElement>('.btn-card-zoom');
+  zoomBtns.forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const algo = btn.getAttribute('data-algo') as ComparisonViewMode;
+      if (currentViewMode === algo) {
+        setComparisonViewMode('all');
+      } else {
+        setComparisonViewMode(algo);
+      }
+    });
+  });
+
+  // Double-click on Card Header to quickly toggle zoom
+  const cardHeaders = document.querySelectorAll<HTMLElement>('.viewport-header');
+  cardHeaders.forEach((header) => {
+    header.addEventListener('dblclick', (e) => {
+      if ((e.target as HTMLElement).closest('button')) return;
+      const card = header.closest('.algo-viewport-card');
+      const algo = card?.getAttribute('data-algo') as ComparisonViewMode;
+      if (algo) {
+        if (currentViewMode === algo) {
+          setComparisonViewMode('all');
+        } else {
+          setComparisonViewMode(algo);
+        }
+      }
+    });
+  });
+
+  // Global Keyboard Shortcut: Escape to return to Tri-Split overview
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && currentViewMode !== 'all') {
+      setComparisonViewMode('all');
+    }
+  });
+}
+
+function setComparisonViewMode(mode: ComparisonViewMode): void {
+  currentViewMode = mode;
+
+  // 1. Update Tabs Active State
+  const tabs = document.querySelectorAll<HTMLButtonElement>('.view-tab-btn');
+  tabs.forEach((tab) => {
+    const tabView = tab.getAttribute('data-view');
+    if (tabView === mode) {
+      tab.classList.add('active');
+    } else {
+      tab.classList.remove('active');
+    }
+  });
+
+  // 2. Update Grid Layout Class
+  const gridEl = document.getElementById('tri-split-grid');
+  if (gridEl) {
+    gridEl.classList.remove('view-focus-bfs', 'view-focus-dijkstra', 'view-focus-astar');
+    if (mode !== 'all') {
+      gridEl.classList.add(`view-focus-${mode}`);
+    }
+  }
+
+  // 3. Update Zoom Buttons State on all cards
+  const zoomBtns = document.querySelectorAll<HTMLButtonElement>('.btn-card-zoom');
+  zoomBtns.forEach((btn) => {
+    const algo = btn.getAttribute('data-algo');
+    const isFocused = mode === algo;
+    btn.classList.toggle('is-focused', isFocused);
+
+    const iconEl = btn.querySelector('.zoom-icon');
+    const textEl = btn.querySelector('.zoom-text');
+
+    if (isFocused) {
+      if (iconEl) iconEl.textContent = '🗗';
+      if (textEl) textEl.textContent = 'Thu nhỏ (Xem cả 3)';
+      btn.title = 'Quay về chế độ xem cả 3 thuật toán';
+    } else {
+      if (iconEl) iconEl.textContent = '⛶';
+      if (textEl) textEl.textContent = 'Phóng to';
+      btn.title = `Phóng to xem chi tiết thuật toán ${algo?.toUpperCase()}`;
+    }
+  });
+
+  // 4. Trigger Canvas Resize & Redraw with scaled cellSize
+  requestAnimationFrame(() => {
+    triSplitView.resize();
+    triSplitView.renderAll(grid, startCoord, endCoord);
   });
 }
 

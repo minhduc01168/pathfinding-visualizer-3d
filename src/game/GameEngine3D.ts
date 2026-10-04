@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { runAStar } from '../core/algorithms/astar';
 import { runBFS } from '../core/algorithms/bfs';
 import { runDijkstra } from '../core/algorithms/dijkstra';
@@ -16,12 +17,14 @@ export interface GameStatus {
 
 /**
  * 3D Arcade Arena ("AI Dungeon Chase") Game Engine
+ * High-visibility, high-contrast STEM theme for both Light & Dark modes
  */
 export class GameEngine3D {
   private container: HTMLElement;
   private scene: THREE.Scene;
   private camera: THREE.PerspectiveCamera;
   private renderer: THREE.WebGLRenderer;
+  private controls!: OrbitControls;
   private animFrameId: number | null = null;
 
   // Grid Data
@@ -46,13 +49,27 @@ export class GameEngine3D {
     lastMoveTime: number;
   }[] = [];
 
-  // 3D Meshes
+  // 3D Meshes & Groups
   private playerMesh!: THREE.Mesh;
+  private playerRingMesh!: THREE.Mesh;
   private exitMesh!: THREE.Mesh;
   private keyMeshes: THREE.Mesh[] = [];
   private cellMeshes: Map<string, THREE.Mesh> = new Map();
   private gridGroup: THREE.Group = new THREE.Group();
   private dynamicGroup: THREE.Group = new THREE.Group();
+
+  // Arena Materials (Theme-aware & high contrast)
+  private floorMat!: THREE.MeshStandardMaterial;
+  private wallMat!: THREE.MeshStandardMaterial;
+  private mudMat!: THREE.MeshStandardMaterial;
+  private platformMat!: THREE.MeshStandardMaterial;
+  private rimMat!: THREE.MeshStandardMaterial;
+
+  // Lights
+  private ambientLight!: THREE.AmbientLight;
+  private dirLight!: THREE.DirectionalLight;
+  private fillLight!: THREE.DirectionalLight;
+  private pointLight!: THREE.PointLight;
 
   // Game Status
   public status: GameStatus = {
@@ -72,24 +89,38 @@ export class GameEngine3D {
     this.container = container;
     this.onStatusChange = onStatusChange;
 
-    // Three.js setup
+    const isLight = !document.body.classList.contains('dark-theme');
+
+    // Scene & Renderer
     this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color(0x06080e);
+    this.scene.background = new THREE.Color(isLight ? 0xebf2fa : 0x0b0f19);
 
     const w = container.clientWidth || 800;
     const h = container.clientHeight || 500;
-    this.camera = new THREE.PerspectiveCamera(50, w / h, 0.1, 1000);
+    this.camera = new THREE.PerspectiveCamera(46, w / h, 0.1, 1000);
 
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
     this.renderer.setSize(w, h);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.shadowMap.enabled = true;
+    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     container.appendChild(this.renderer.domElement);
 
+    // Orbit Controls for free inspection, rotation and zoom
+    this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+    this.controls.enableDamping = true;
+    this.controls.dampingFactor = 0.05;
+    this.controls.maxPolarAngle = Math.PI / 2 - 0.06;
+    this.controls.minDistance = 8;
+    this.controls.maxDistance = 75;
+
+    // Groups
     this.scene.add(this.gridGroup);
     this.scene.add(this.dynamicGroup);
 
-    this.setupLights();
+    // Setup Theme-Aware Materials & Lights
+    this.initMaterials(isLight);
+    this.setupLights(isLight);
 
     this.keydownHandler = (e: KeyboardEvent) => this.handleKeyDown(e);
     window.addEventListener('keydown', this.keydownHandler);
@@ -98,18 +129,127 @@ export class GameEngine3D {
     this.animate = this.animate.bind(this);
   }
 
-  private setupLights(): void {
-    const ambient = new THREE.AmbientLight(0xffffff, 0.7);
-    this.scene.add(ambient);
+  private initMaterials(isLight: boolean): void {
+    // Floor: In light mode, pure crisp white ceramic for maximum visibility!
+    this.floorMat = new THREE.MeshStandardMaterial({
+      color: isLight ? 0xffffff : 0x131d33,
+      roughness: isLight ? 0.35 : 0.75,
+      metalness: isLight ? 0.05 : 0.25
+    });
 
-    const dirLight = new THREE.DirectionalLight(0x38bdf8, 1.3);
-    dirLight.position.set(20, 40, 20);
-    dirLight.castShadow = true;
-    this.scene.add(dirLight);
+    // Walls: In light mode, deep dark obsidian navy for striking 15:1 contrast against white floor!
+    this.wallMat = new THREE.MeshStandardMaterial({
+      color: isLight ? 0x1e293b : 0x334155,
+      roughness: isLight ? 0.25 : 0.45,
+      metalness: isLight ? 0.35 : 0.65
+    });
 
-    const pointLight = new THREE.PointLight(0xf59e0b, 2, 40);
-    pointLight.position.set(0, 15, 0);
-    this.scene.add(pointLight);
+    // Mud Traps: Rich amber brown with distinct height
+    this.mudMat = new THREE.MeshStandardMaterial({
+      color: isLight ? 0xd97706 : 0x78350f,
+      roughness: 0.9,
+      metalness: 0.1
+    });
+
+    // Base Platform beneath the arena
+    this.platformMat = new THREE.MeshStandardMaterial({
+      color: isLight ? 0xe2e8f0 : 0x070a13,
+      roughness: 0.5,
+      metalness: 0.1
+    });
+
+    // Tournament Border Rim
+    this.rimMat = new THREE.MeshStandardMaterial({
+      color: isLight ? 0x0284c7 : 0x38bdf8,
+      roughness: 0.2,
+      metalness: 0.8,
+      emissive: isLight ? 0x0369a1 : 0x0284c7,
+      emissiveIntensity: isLight ? 0.3 : 0.6
+    });
+  }
+
+  private setupLights(isLight: boolean): void {
+    // Ambient Light: Bright and balanced daylight in light mode
+    this.ambientLight = new THREE.AmbientLight(
+      isLight ? 0xffffff : 0x818cf8,
+      isLight ? 0.95 : 0.55
+    );
+    this.scene.add(this.ambientLight);
+
+    // Directional Sun Light: Strong top-down angle casting crisp soft shadows
+    this.dirLight = new THREE.DirectionalLight(
+      isLight ? 0xffffff : 0x38bdf8,
+      isLight ? 1.45 : 1.2
+    );
+    this.dirLight.position.set(25, 45, 25);
+    this.dirLight.castShadow = true;
+    this.dirLight.shadow.mapSize.width = 2048;
+    this.dirLight.shadow.mapSize.height = 2048;
+    this.dirLight.shadow.camera.near = 0.5;
+    this.dirLight.shadow.camera.far = 140;
+    const d = 28;
+    this.dirLight.shadow.camera.left = -d;
+    this.dirLight.shadow.camera.right = d;
+    this.dirLight.shadow.camera.top = d;
+    this.dirLight.shadow.camera.bottom = -d;
+    this.scene.add(this.dirLight);
+
+    // Fill Light: Soft blue-tinted fill from the opposite side to eliminate pitch-black shadows
+    this.fillLight = new THREE.DirectionalLight(
+      isLight ? 0xdbeafe : 0x4f46e5,
+      isLight ? 0.45 : 0.25
+    );
+    this.fillLight.position.set(-25, 30, -25);
+    this.scene.add(this.fillLight);
+
+    // Point Light: Warm focal highlight
+    this.pointLight = new THREE.PointLight(0xf59e0b, isLight ? 1.4 : 2.5, 45);
+    this.pointLight.position.set(0, 16, 0);
+    this.scene.add(this.pointLight);
+  }
+
+  public updateTheme(isLight: boolean): void {
+    if (this.scene) {
+      this.scene.background = new THREE.Color(isLight ? 0xebf2fa : 0x0b0f19);
+    }
+    if (this.floorMat) {
+      this.floorMat.color.setHex(isLight ? 0xffffff : 0x131d33);
+      this.floorMat.roughness = isLight ? 0.35 : 0.75;
+      this.floorMat.metalness = isLight ? 0.05 : 0.25;
+      this.floorMat.needsUpdate = true;
+    }
+    if (this.wallMat) {
+      this.wallMat.color.setHex(isLight ? 0x1e293b : 0x334155);
+      this.wallMat.roughness = isLight ? 0.25 : 0.45;
+      this.wallMat.metalness = isLight ? 0.35 : 0.65;
+      this.wallMat.needsUpdate = true;
+    }
+    if (this.mudMat) {
+      this.mudMat.color.setHex(isLight ? 0xd97706 : 0x78350f);
+      this.mudMat.needsUpdate = true;
+    }
+    if (this.platformMat) {
+      this.platformMat.color.setHex(isLight ? 0xe2e8f0 : 0x070a13);
+      this.platformMat.needsUpdate = true;
+    }
+    if (this.rimMat) {
+      this.rimMat.color.setHex(isLight ? 0x0284c7 : 0x38bdf8);
+      this.rimMat.emissive.setHex(isLight ? 0x0369a1 : 0x0284c7);
+      this.rimMat.emissiveIntensity = isLight ? 0.3 : 0.6;
+      this.rimMat.needsUpdate = true;
+    }
+    if (this.ambientLight) {
+      this.ambientLight.color.setHex(isLight ? 0xffffff : 0x818cf8);
+      this.ambientLight.intensity = isLight ? 0.95 : 0.55;
+    }
+    if (this.dirLight) {
+      this.dirLight.color.setHex(isLight ? 0xffffff : 0x38bdf8);
+      this.dirLight.intensity = isLight ? 1.45 : 1.2;
+    }
+    if (this.fillLight) {
+      this.fillLight.color.setHex(isLight ? 0xdbeafe : 0x4f46e5);
+      this.fillLight.intensity = isLight ? 0.45 : 0.25;
+    }
   }
 
   public initGame(rows: number = 21, cols: number = 27): void {
@@ -167,15 +307,24 @@ export class GameEngine3D {
     // Spawn Enemies at distant points
     this.spawnEnemies();
 
-    // Camera view looking down at an action isometric angle
-    const maxDim = Math.max(rows, cols);
-    this.camera.position.set(0, maxDim * 1.1, maxDim * 0.85);
-    this.camera.lookAt(0, 0, 0);
+    // Position camera closer to fill ~75-80% of the screen height
+    this.resetCamera();
 
     if (this.onStatusChange) this.onStatusChange(this.status);
 
     if (!this.animFrameId) {
       this.animate();
+    }
+  }
+
+  public resetCamera(): void {
+    const maxDim = Math.max(this.rows, this.cols);
+    // Sweet spot isometric angle that fills viewport and clearly reveals walls & corridors
+    this.camera.position.set(0, maxDim * 0.72, maxDim * 0.58);
+    this.camera.lookAt(0, 0, 0);
+    if (this.controls) {
+      this.controls.target.set(0, 0, 0);
+      this.controls.update();
     }
   }
 
@@ -192,24 +341,35 @@ export class GameEngine3D {
 
     const offsetX = (this.cols - 1) / 2;
     const offsetZ = (this.rows - 1) / 2;
-    const boxGeo = new THREE.BoxGeometry(0.9, 1, 0.9);
 
-    const wallMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.5 });
-    const mudMat = new THREE.MeshStandardMaterial({ color: 0x78350f, roughness: 0.9 });
-    const floorMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.8 });
+    // 1. Sleek Tournament Base Platform
+    const platformGeo = new THREE.BoxGeometry(this.cols + 1.2, 0.35, this.rows + 1.2);
+    const platformMesh = new THREE.Mesh(platformGeo, this.platformMat);
+    platformMesh.position.set(0, -0.18, 0);
+    platformMesh.receiveShadow = true;
+    this.gridGroup.add(platformMesh);
+
+    // Outer Tournament Accent Rim
+    const rimGeo = new THREE.BoxGeometry(this.cols + 1.45, 0.1, this.rows + 1.45);
+    const rimMesh = new THREE.Mesh(rimGeo, this.rimMat);
+    rimMesh.position.set(0, -0.32, 0);
+    this.gridGroup.add(rimMesh);
+
+    // 2. Arena Cells: 0.93 size leaves a 0.07 gap, creating crisp, clear grid lines!
+    const boxGeo = new THREE.BoxGeometry(0.93, 1, 0.93);
 
     for (let r = 0; r < this.rows; r++) {
       for (let c = 0; c < this.cols; c++) {
         const type = this.grid[r][c];
-        let mat = floorMat;
+        let mat = this.floorMat;
         let h = 0.1;
 
         if (type === NodeType.WALL) {
-          mat = wallMat;
-          h = 1.3;
+          mat = this.wallMat;
+          h = 1.4; // Distinct tall pillars
         } else if (type === NodeType.MUD) {
-          mat = mudMat;
-          h = 0.25;
+          mat = this.mudMat;
+          h = 0.28;
         }
 
         const mesh = new THREE.Mesh(boxGeo, mat);
@@ -223,41 +383,61 @@ export class GameEngine3D {
       }
     }
 
-    // Player Mesh (Golden Cyan Cyber Gem)
-    const playerGeo = new THREE.DodecahedronGeometry(0.45);
+    // 3. Player Mesh (Hero Cyan Crystal Gem with Glowing Ring)
+    const playerGeo = new THREE.DodecahedronGeometry(0.48);
     const playerMat = new THREE.MeshStandardMaterial({
       color: 0x06b6d4,
       emissive: 0x0891b2,
-      emissiveIntensity: 0.6,
-      roughness: 0.2
+      emissiveIntensity: 0.7,
+      roughness: 0.15,
+      metalness: 0.3
     });
     this.playerMesh = new THREE.Mesh(playerGeo, playerMat);
-    this.updateMeshCoord(this.playerMesh, this.playerPos, 0.5);
+    this.playerMesh.castShadow = true;
+    this.updateMeshCoord(this.playerMesh, this.playerPos, 0.55);
     this.dynamicGroup.add(this.playerMesh);
 
-    // Exit Portal (Glowing Ring & Crystal)
-    const portalGeo = new THREE.TorusGeometry(0.4, 0.1, 16, 32);
+    // Glowing base ring under player to track exact grid cell
+    const ringGeo = new THREE.RingGeometry(0.28, 0.42, 24);
+    const ringMat = new THREE.MeshBasicMaterial({
+      color: 0x0284c7,
+      side: THREE.DoubleSide,
+      transparent: true,
+      opacity: 0.75
+    });
+    this.playerRingMesh = new THREE.Mesh(ringGeo, ringMat);
+    this.playerRingMesh.rotation.x = -Math.PI / 2;
+    this.updateMeshCoord(this.playerRingMesh, this.playerPos, 0.055);
+    this.dynamicGroup.add(this.playerRingMesh);
+
+    // 4. Exit Portal (Glowing Emerald Ring & Core)
+    const portalGeo = new THREE.TorusGeometry(0.46, 0.12, 16, 32);
     const portalMat = new THREE.MeshStandardMaterial({
       color: 0x10b981,
       emissive: 0x059669,
-      emissiveIntensity: 0.9
+      emissiveIntensity: 1.1,
+      roughness: 0.2
     });
     this.exitMesh = new THREE.Mesh(portalGeo, portalMat);
     this.exitMesh.rotation.x = Math.PI / 2;
-    this.updateMeshCoord(this.exitMesh, this.exitPos, 0.4);
+    this.exitMesh.castShadow = true;
+    this.updateMeshCoord(this.exitMesh, this.exitPos, 0.45);
     this.dynamicGroup.add(this.exitMesh);
 
-    // Keys (Spinning Gold Pyramids)
-    const keyGeo = new THREE.OctahedronGeometry(0.35);
+    // 5. Keys (Spinning Gold Pyramids with Float Animation)
+    const keyGeo = new THREE.OctahedronGeometry(0.38);
     const keyMat = new THREE.MeshStandardMaterial({
       color: 0xfbbf24,
-      emissive: 0xd97706,
-      emissiveIntensity: 0.8
+      emissive: 0xf59e0b,
+      emissiveIntensity: 0.9,
+      roughness: 0.1,
+      metalness: 0.8
     });
 
     for (const kp of this.keyPositions) {
       const km = new THREE.Mesh(keyGeo, keyMat);
-      this.updateMeshCoord(km, kp, 0.4);
+      km.castShadow = true;
+      this.updateMeshCoord(km, kp, 0.45);
       this.dynamicGroup.add(km);
       this.keyMeshes.push(km);
     }
@@ -270,11 +450,16 @@ export class GameEngine3D {
         type: 'bfs',
         pos: { r: this.rows - 2, c: 1 },
         mesh: new THREE.Mesh(
-          new THREE.SphereGeometry(0.4, 16, 16),
-          new THREE.MeshStandardMaterial({ color: 0x22c55e, emissive: 0x16a34a, emissiveIntensity: 0.7 })
+          new THREE.SphereGeometry(0.44, 16, 16),
+          new THREE.MeshStandardMaterial({
+            color: 0x10b981,
+            emissive: 0x059669,
+            emissiveIntensity: 0.8,
+            roughness: 0.2
+          })
         ),
         path: [],
-        color: 0x22c55e,
+        color: 0x10b981,
         speedIntervalMs: 500,
         lastMoveTime: 0
       },
@@ -283,11 +468,16 @@ export class GameEngine3D {
         type: 'dijkstra',
         pos: { r: 1, c: this.cols - 2 },
         mesh: new THREE.Mesh(
-          new THREE.BoxGeometry(0.7, 0.7, 0.7),
-          new THREE.MeshStandardMaterial({ color: 0x3b82f6, emissive: 0x2563eb, emissiveIntensity: 0.7 })
+          new THREE.BoxGeometry(0.72, 0.72, 0.72),
+          new THREE.MeshStandardMaterial({
+            color: 0x2563eb,
+            emissive: 0x1d4ed8,
+            emissiveIntensity: 0.8,
+            roughness: 0.2
+          })
         ),
         path: [],
-        color: 0x3b82f6,
+        color: 0x2563eb,
         speedIntervalMs: 450,
         lastMoveTime: 0
       },
@@ -296,8 +486,13 @@ export class GameEngine3D {
         type: 'astar',
         pos: { r: this.rows - 2, c: this.cols - 4 },
         mesh: new THREE.Mesh(
-          new THREE.ConeGeometry(0.4, 0.8, 16),
-          new THREE.MeshStandardMaterial({ color: 0xef4444, emissive: 0xdc2626, emissiveIntensity: 0.9 })
+          new THREE.ConeGeometry(0.42, 0.85, 16),
+          new THREE.MeshStandardMaterial({
+            color: 0xef4444,
+            emissive: 0xdc2626,
+            emissiveIntensity: 1.0,
+            roughness: 0.15
+          })
         ),
         path: [],
         color: 0xef4444,
@@ -307,7 +502,8 @@ export class GameEngine3D {
     ];
 
     for (const enemy of this.enemies) {
-      this.updateMeshCoord(enemy.mesh, enemy.pos, 0.5);
+      enemy.mesh.castShadow = true;
+      this.updateMeshCoord(enemy.mesh, enemy.pos, 0.52);
       this.dynamicGroup.add(enemy.mesh);
     }
   }
@@ -333,7 +529,6 @@ export class GameEngine3D {
     } else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
       nc++;
     } else if (e.code === 'Space') {
-      // Place trap behind player
       this.placeTrap();
       return;
     } else {
@@ -349,7 +544,10 @@ export class GameEngine3D {
       this.grid[nr][nc] !== NodeType.WALL
     ) {
       this.playerPos = { r: nr, c: nc };
-      this.updateMeshCoord(this.playerMesh, this.playerPos, 0.5);
+      this.updateMeshCoord(this.playerMesh, this.playerPos, 0.55);
+      if (this.playerRingMesh) {
+        this.updateMeshCoord(this.playerRingMesh, this.playerPos, 0.055);
+      }
 
       // Check key pickup
       for (let i = this.keyPositions.length - 1; i >= 0; i--) {
@@ -381,13 +579,13 @@ export class GameEngine3D {
     const r = this.playerPos.r;
     const c = this.playerPos.c;
 
-    // Convert cell to a mud trap or barricade
+    // Convert cell to a mud trap
     this.grid[r][c] = NodeType.MUD;
     this.status.trapsAvailable--;
 
     const mesh = this.cellMeshes.get(`${r},${c}`);
     if (mesh) {
-      mesh.material = new THREE.MeshStandardMaterial({ color: 0x78350f, roughness: 0.9 });
+      mesh.material = this.mudMat;
       mesh.scale.set(1, 0.35, 1);
       mesh.position.y = 0.175;
     }
@@ -399,7 +597,6 @@ export class GameEngine3D {
   }
 
   private recalculateAllEnemyPaths(): void {
-    // Construct GridNode representation for search
     const searchGrid: GridNode[][] = [];
     for (let r = 0; r < this.rows; r++) {
       const row: GridNode[] = [];
@@ -431,7 +628,7 @@ export class GameEngine3D {
       }
 
       if (res && res.shortestPath.length > 1) {
-        enemy.path = res.shortestPath.slice(1); // Exclude current cell
+        enemy.path = res.shortestPath.slice(1);
       } else {
         enemy.path = [];
       }
@@ -445,7 +642,6 @@ export class GameEngine3D {
       if (now - enemy.lastMoveTime >= enemy.speedIntervalMs) {
         enemy.lastMoveTime = now;
 
-        // If no path or target moved, recalculate
         if (enemy.path.length === 0) {
           this.recalculateAllEnemyPaths();
         }
@@ -453,7 +649,7 @@ export class GameEngine3D {
         if (enemy.path.length > 0) {
           const nextCell = enemy.path.shift()!;
           enemy.pos = nextCell;
-          this.updateMeshCoord(enemy.mesh, enemy.pos, 0.5);
+          this.updateMeshCoord(enemy.mesh, enemy.pos, 0.52);
 
           // Check collision with player
           if (enemy.pos.r === this.playerPos.r && enemy.pos.c === this.playerPos.c) {
@@ -473,13 +669,28 @@ export class GameEngine3D {
 
     const now = performance.now();
 
-    // Rotate keys & portal for juice
-    for (const km of this.keyMeshes) {
-      km.rotation.y += 0.03;
-      km.rotation.x += 0.01;
+    // Orbit Controls Damping Update
+    if (this.controls) {
+      this.controls.update();
     }
+
+    // Smooth Hover & Spin Animations for Entities
+    const floatOffset = Math.sin(now * 0.005) * 0.08;
+
+    for (let i = 0; i < this.keyMeshes.length; i++) {
+      const km = this.keyMeshes[i];
+      km.rotation.y += 0.035;
+      km.rotation.x += 0.015;
+      km.position.y = 0.45 + floatOffset;
+    }
+
     if (this.exitMesh) {
-      this.exitMesh.rotation.z += 0.02;
+      this.exitMesh.rotation.z += 0.025;
+    }
+
+    if (this.playerMesh) {
+      this.playerMesh.rotation.y += 0.018;
+      this.playerMesh.position.y = 0.55 + Math.sin(now * 0.007) * 0.04;
     }
 
     this.updateEnemyAI(now);
@@ -493,11 +704,17 @@ export class GameEngine3D {
     this.camera.aspect = w / h;
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(w, h);
+    if (this.controls) {
+      this.controls.update();
+    }
   }
 
   public destroy(): void {
     if (this.animFrameId) cancelAnimationFrame(this.animFrameId);
     window.removeEventListener('keydown', this.keydownHandler);
+    if (this.controls) {
+      this.controls.dispose();
+    }
     this.renderer.dispose();
   }
 }

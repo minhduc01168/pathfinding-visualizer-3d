@@ -84,7 +84,7 @@ export class GridCanvas2D {
   }
 
   private isLightTheme(): boolean {
-    return document.body.classList.contains('light-theme');
+    return !document.body.classList.contains('dark-theme');
   }
 
   public render(
@@ -98,13 +98,13 @@ export class GridCanvas2D {
 
     const palette = isLight
       ? {
-          bg: '#f8fafc',
-          gridLine: 'rgba(0, 0, 0, 0.08)',
+          bg: '#ffffff',
+          gridLine: 'rgba(203, 213, 225, 0.75)',
           empty: '#ffffff',
-          visited: 'rgba(99, 102, 241, 0.32)',
-          visitedBorder: 'rgba(99, 102, 241, 0.65)',
-          path: '#f59e0b',
-          pathGlow: 'rgba(245, 158, 11, 0.7)'
+          visited: 'rgba(99, 102, 241, 0.28)',
+          visitedBorder: 'rgba(99, 102, 241, 0.75)',
+          path: '#d97706',
+          pathGlow: 'rgba(217, 119, 6, 0.6)'
         }
       : {
           bg: '#0a0e1a',

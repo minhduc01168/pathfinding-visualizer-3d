@@ -87,7 +87,7 @@ export function runBFS(
     shortestPath,
     metrics: {
       algorithm: 'bfs',
-      name: 'BFS (Breadth-First Search)',
+      name: 'Thuật toán BFS',
       executionTimeMs,
       visitedNodesCount: visitedOrder.length,
       pathLength: shortestPath.length,

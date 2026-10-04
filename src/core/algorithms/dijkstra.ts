@@ -94,7 +94,7 @@ export function runDijkstra(
     shortestPath,
     metrics: {
       algorithm: 'dijkstra',
-      name: "Dijkstra's Algorithm",
+      name: 'Thuật toán Dijkstra',
       executionTimeMs,
       visitedNodesCount: visitedOrder.length,
       pathLength: shortestPath.length,

@@ -18,142 +18,166 @@
       <div>
         <h1 class="brand-title">PathQuest 2D/3D</h1>
       </div>
-      <span class="brand-badge">PRO EDITION</span>
     </div>
 
     <!-- Mode Switcher -->
     <div class="mode-switcher">
       <button id="btn-mode-lab" class="mode-btn active">
-        <span>🔬</span> Lab Benchmark (Tri-Split)
+        <span>🔬</span> Sa Bàn Đối Đầu (3 Thuật Toán)
       </button>
       <button id="btn-mode-arcade" class="mode-btn">
-        <span>🎮</span> Arcade Arena 3D (AI Chase)
+        <span>🎮</span> Đấu Trường 3D (Rượt Đuổi AI)
       </button>
     </div>
 
     <!-- Header Controls -->
     <div class="header-controls">
       <button id="btn-theme-toggle" class="theme-toggle-btn" title="Chuyển đổi Chế độ Sáng / Tối">
-        <span id="theme-icon">☀️</span> <span id="theme-text">Chế Độ Sáng</span>
+        <span id="theme-icon">🌙</span> <span id="theme-text">Chế Độ Tối</span>
       </button>
 
       <select id="select-grid-preset" class="preset-select">
-        <option value="25x15">Kích thước: 25 × 15 (Nhỏ)</option>
-        <option value="35x21" selected>Kích thước: 35 × 21 (Tiêu chuẩn)</option>
-        <option value="50x30">Kích thước: 50 × 30 (Lớn)</option>
+        <option value="25x15">Lưới: 25 × 15 (Nhỏ)</option>
+        <option value="35x21" selected>Lưới: 35 × 21 (Tiêu chuẩn)</option>
+        <option value="50x30">Lưới: 50 × 30 (Lớn)</option>
       </select>
     </div>
   </header>
 
-  <!-- Control Toolbar -->
-  <div class="control-toolbar" id="control-toolbar">
-    <!-- Brush Palette -->
-    <div class="tool-group">
-      <span class="group-label">Bút vẽ:</span>
-      <button class="brush-btn active" data-brush="wall">
-        <span class="brush-dot wall"></span> Tường
-      </button>
-      <button class="brush-btn" data-brush="mud">
-        <span class="brush-dot mud"></span> Bùn (+5)
-      </button>
-      <button class="brush-btn" data-brush="water">
-        <span class="brush-dot water"></span> Nước (+10)
-      </button>
-      <button class="brush-btn" data-brush="start">
-        <span class="brush-dot start"></span> Điểm Bắt đầu
-      </button>
-      <button class="brush-btn" data-brush="end">
-        <span class="brush-dot end"></span> Đích đến
-      </button>
-      <button class="brush-btn" data-brush="eraser">
-        <span class="brush-dot eraser"></span> Tẩy
-      </button>
-    </div>
-
-    <!-- Generator Group -->
-    <div class="tool-group">
-      <span class="group-label">Sinh địa hình:</span>
-      <select id="select-maze" class="preset-select">
-        <option value="none">-- Chọn kiểu sinh --</option>
-        <option value="recursive">Mê cung hành lang (Recursive)</option>
-        <option value="random">Địa hình ngẫu nhiên (Random)</option>
-        <option value="trap">Bẫy đầm lầy (Weight Trap)</option>
-      </select>
-    </div>
-
-    <!-- Speed Control -->
-    <div class="tool-group">
-      <span class="group-label">Tốc độ:</span>
-      <select id="select-speed" class="preset-select">
-        <option value="0.5">0.5x (Chậm)</option>
-        <option value="1">1x (Thường)</option>
-        <option value="2.5" selected>2.5x (Nhanh)</option>
-        <option value="6">6x (Rất nhanh)</option>
-        <option value="999">Tức thì (Instant)</option>
-      </select>
-    </div>
-
-    <!-- Actions -->
-    <div class="tool-group">
-      <button id="btn-race" class="btn-primary">
-        <span>▶</span> Chạy Đua (Race All)
-      </button>
-      <button id="btn-open-3d" class="btn-secondary btn-accent-3d">
-        <span>🧊</span> Khám Phá 3D Voxel
-      </button>
-      <button id="btn-clear-trace" class="btn-secondary">
-        <span>🧹</span> Xóa Vết
-      </button>
-      <button id="btn-reset-grid" class="btn-secondary">
-        <span>🔄</span> Làm Mới Lưới
-      </button>
-    </div>
-  </div>
-
-  <!-- Visual Legend Bar (Thanh Chú Giải Trực Quan Địa Hình & Tác Tử) -->
-  <div class="visual-legend-bar">
-    <div class="legend-item">
-      <span class="legend-badge start-badge">🚀 START</span>
-      <span class="legend-text">Điểm Khởi Hành</span>
-    </div>
-    <div class="legend-item">
-      <span class="legend-badge end-badge">🎯 END</span>
-      <span class="legend-text">Cổng Về Đích</span>
-    </div>
-    <div class="legend-item">
-      <span class="legend-badge wall-badge">🧱 TƯỜNG ĐÁ</span>
-      <span class="legend-text">Chướng Ngại Vật (Cost = ∞)</span>
-    </div>
-    <div class="legend-item">
-      <span class="legend-badge mud-badge">🟤 BÙN LẦY</span>
-      <span class="legend-text">Níu chân (Cost = 5)</span>
-    </div>
-    <div class="legend-item">
-      <span class="legend-badge water-badge">💧 VỰC NƯỚC</span>
-      <span class="legend-text">Vực sâu (Cost = 10)</span>
-    </div>
-    <div class="legend-item">
-      <span class="legend-badge wave-badge">⚡ SÓNG DUYỆT</span>
-      <span class="legend-text">Quét Radar Lưới</span>
-    </div>
-    <div class="legend-item">
-      <span class="legend-badge path-badge">⭐ ĐƯỜNG VÀNG</span>
-      <span class="legend-text">Đường Đi Tối Ưu</span>
-    </div>
-  </div>
-
   <!-- Main View Container: Lab Benchmark Mode -->
   <main class="main-view-container" id="lab-view-container">
-    <!-- Master Interactive Painting Board -->
-    <section class="master-board-section">
-      <div class="master-board-header">
-        <div class="master-board-title">
-          <span>🖌️</span> Bản Đồ Tương Tác (Nhấp & Kéo chuột để vẽ tường, bùn lầy, nước hoặc di chuyển Start/End)
+    <!-- Master Interactive Map Studio (Xưởng Sa Bàn & Thiết Kế Bản Đồ) -->
+    <section class="master-studio-card" id="master-studio-card">
+      <!-- Studio Header with Status & Live Sync Badge -->
+      <div class="studio-header">
+        <div class="studio-title-wrap">
+          <div class="studio-icon-badge">🎨</div>
+          <div>
+            <h2 class="studio-title">Xưởng Sa Bàn & Thiết Kế Bản Đồ Tương Tác</h2>
+            <p class="studio-subtitle">
+              Tự do vẽ chướng ngại vật & bẫy địa hình • Dữ liệu sa bàn sẽ <strong>tự động đồng bộ tức thì</strong> xuống 3 thuật toán bên dưới!
+            </p>
+          </div>
         </div>
-        <span class="status-badge idle">Chế độ Vẽ Sẵn Sàng</span>
+        <div class="studio-sync-badge">
+          <span class="pulse-indicator"></span>
+          <span>Đồng Bộ Trực Tiếp (3 Thuật Toán)</span>
+        </div>
       </div>
-      <div class="master-canvas-container">
-        <canvas id="master-canvas"></canvas>
+
+      <!-- 2-Column Balanced Studio Layout -->
+      <div class="studio-main-grid">
+        <!-- Left Column: Toolbox, Guided Steps 1, 2, 3, Stats & Tips -->
+        <div class="studio-sidebar-panel" id="control-toolbar">
+          <!-- Step 1: Chọn Cọ Vẽ Địa Hình -->
+          <div class="workflow-step-box step-brush">
+            <div class="step-label-wrap">
+              <span class="step-badge">Bước 1</span>
+              <span class="step-title">Chọn Cọ Vẽ Địa Hình:</span>
+            </div>
+            <div class="brush-palette-group">
+              <button class="brush-btn active" data-brush="wall" title="Tường đá kiên cố (Chi phí = ∞)">
+                <span class="brush-dot wall"></span> 🧱 Tường Đá
+              </button>
+              <button class="brush-btn" data-brush="mud" title="Bùn lầy níu chân (Tốn thêm +5 bước)">
+                <span class="brush-dot mud"></span> 🟤 Bùn (+5)
+              </button>
+              <button class="brush-btn" data-brush="water" title="Vực nước sâu (Tốn thêm +10 bước)">
+                <span class="brush-dot water"></span> 💧 Nước (+10)
+              </button>
+              <button class="brush-btn" data-brush="start" title="Di chuyển điểm xuất phát">
+                <span class="brush-dot start"></span> 🚀 Bắt Đầu
+              </button>
+              <button class="brush-btn" data-brush="end" title="Di chuyển cổng về đích">
+                <span class="brush-dot end"></span> 🎯 Đích Đến
+              </button>
+              <button class="brush-btn" data-brush="eraser" title="Tẩy xóa chướng ngại vật">
+                <span class="brush-dot eraser"></span> 🧹 Tẩy Xóa
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 2: Mẫu Sinh Tự Động & Thao Tác Nhanh -->
+          <div class="workflow-step-box step-generator">
+            <div class="step-label-wrap">
+              <span class="step-badge">Bước 2</span>
+              <span class="step-title">Sinh Mê Cung Nhanh:</span>
+            </div>
+            <div class="step-controls-inline">
+              <select id="select-maze" class="preset-select select-maze-styled" title="Chọn mẫu địa hình tạo sẵn">
+                <option value="none">🎲 -- Chọn Mẫu Sinh --</option>
+                <option value="recursive">Mê cung hành lang (Recursive)</option>
+                <option value="random">Địa hình ngẫu nhiên (Random)</option>
+                <option value="trap">Bẫy đầm lầy (Weight Trap)</option>
+              </select>
+              <button id="btn-clear-trace" class="btn-studio-action" title="Xóa sóng quét và đường đi, giữ nguyên tường">
+                <span>🧹</span> Xóa Vết
+              </button>
+              <button id="btn-reset-grid" class="btn-studio-action" title="Xóa trắng bản đồ về trạng thái ban đầu">
+                <span>🔄</span> Làm Mới
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 3: Tốc Độ & Khởi Động Thi Đấu -->
+          <div class="workflow-step-box step-action">
+            <div class="step-label-wrap">
+              <span class="step-badge highlight">Bước 3</span>
+              <span class="step-title">Khởi Động Thi Đấu:</span>
+            </div>
+            <div class="step-controls-inline">
+              <div class="speed-control-wrap">
+                <span class="speed-label">Tốc độ:</span>
+                <select id="select-speed" class="preset-select select-speed-styled">
+                  <option value="0.5">0.5x</option>
+                  <option value="1">1x</option>
+                  <option value="2.5" selected>2.5x</option>
+                  <option value="6">6x</option>
+                  <option value="999">Tức thì</option>
+                </select>
+              </div>
+              <button id="btn-race" class="btn-race-primary">
+                <span class="race-icon">▶</span> CHẠY ĐUA TẤT CẢ
+              </button>
+              <button id="btn-open-3d" class="btn-studio-3d" title="Khám phá sa bàn trong không gian 3D WebGL">
+                <span>🧊</span> Không Gian 3D
+              </button>
+            </div>
+          </div>
+
+          <!-- Real-time Stats & Friendly Guidance Box -->
+          <div class="studio-stats-box">
+            <div class="stats-box-title">📊 Thông Số Bản Đồ Thực:</div>
+            <div class="studio-stats-group">
+              <span class="stat-pill"><span class="stat-icon">📐</span> Lưới: <strong id="stat-dim">35 × 21</strong></span>
+              <span class="stat-pill"><span class="stat-icon">🚀</span> Xuất phát: <strong id="stat-start">(5, 5)</strong></span>
+              <span class="stat-pill"><span class="stat-icon">🎯</span> Đích đến: <strong id="stat-end">(15, 29)</strong></span>
+              <span class="stat-pill"><span class="stat-icon">🧱</span> Tường: <strong id="stat-walls">0</strong></span>
+              <span class="stat-pill"><span class="stat-icon">🟤</span> Bùn: <strong id="stat-mud">0</strong></span>
+              <span class="stat-pill"><span class="stat-icon">💧</span> Nước: <strong id="stat-water">0</strong></span>
+            </div>
+            <div class="studio-quick-tip">
+              <span>💡 <strong>Hướng dẫn học sinh:</strong> Nhấp & rê chuột trên lưới để vẽ chướng ngại vật. Dữ liệu sa bàn sẽ lập tức đồng bộ xuống 3 thuật toán bên dưới!</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Canvas Sa Bàn Cỡ Lớn & Docked Legend -->
+        <div class="studio-canvas-panel">
+          <div class="master-canvas-container">
+            <canvas id="master-canvas"></canvas>
+          </div>
+          <!-- Integrated Visual Legend Bar -->
+          <div class="visual-legend-bar studio-legend-docked">
+            <div class="legend-item"><span class="legend-badge start-badge">🚀 XUẤT PHÁT</span><span class="legend-text">Điểm Bắt Đầu</span></div>
+            <div class="legend-item"><span class="legend-badge end-badge">🎯 ĐÍCH ĐẾN</span><span class="legend-text">Cổng Về Đích</span></div>
+            <div class="legend-item"><span class="legend-badge wall-badge">🧱 TƯỜNG ĐÁ</span><span class="legend-text">Chặn đường (∞)</span></div>
+            <div class="legend-item"><span class="legend-badge mud-badge">🟤 BÙN LẦY</span><span class="legend-text">Níu chân (+5)</span></div>
+            <div class="legend-item"><span class="legend-badge water-badge">💧 VỰC NƯỚC</span><span class="legend-text">Vực sâu (+10)</span></div>
+            <div class="legend-item"><span class="legend-badge wave-badge">⚡ SÓNG DUYỆT</span><span class="legend-text">Vùng Đã Quét</span></div>
+            <div class="legend-item"><span class="legend-badge path-badge">⭐ ĐƯỜNG TỐI ƯU</span><span class="legend-text">Đường Ngắn Nhất</span></div>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -161,19 +185,48 @@
     <section>
       <div class="master-board-header" style="margin-bottom: 0.75rem;">
         <div class="master-board-title">
-          <span>⚡</span> So Sánh Đối Đầu Song Song (Tri-Split Synchronized View & Persistent Traces)
+          <span>⚡</span> So Sánh Đối Đầu Song Song (3 Thuật Toán Cùng Lúc)
         </div>
       </div>
 
-      <div class="tri-split-grid">
+      <!-- View Mode Switcher: Xem cả 3 vs Phóng to từng thuật toán -->
+      <div class="view-mode-bar" id="view-mode-bar">
+        <div class="view-mode-tabs">
+          <button class="view-tab-btn active" data-view="all" id="tab-view-all">
+            <span>📊</span> Xem Cả 3 Thuật Toán
+          </button>
+          <button class="view-tab-btn" data-view="bfs" id="tab-view-bfs">
+            <span class="algo-dot bfs"></span> Phóng To BFS
+          </button>
+          <button class="view-tab-btn" data-view="dijkstra" id="tab-view-dijkstra">
+            <span class="algo-dot dijkstra"></span> Phóng To Dijkstra
+          </button>
+          <button class="view-tab-btn" data-view="astar" id="tab-view-astar">
+            <span class="algo-dot astar"></span> Phóng To A*
+          </button>
+        </div>
+        <div class="view-mode-hint">
+          <span>💡 Mẹo:</span> Nhấn <kbd>Esc</kbd> để trở về xem cả 3 | Bấm <kbd>⛶ Phóng to</kbd> trên từng khung hình
+        </div>
+      </div>
+
+      <div class="tri-split-grid" id="tri-split-grid">
         <!-- BFS Viewport -->
-        <div class="algo-viewport-card bfs">
+        <div class="algo-viewport-card bfs" data-algo="bfs">
           <div class="viewport-header">
-            <div class="algo-title-wrap">
+            <div class="viewport-header-top">
               <span class="algo-badge bfs">BFS</span>
-              <span class="algo-subdesc">FIFO Queue • Bỏ qua trọng số</span>
+              <div class="viewport-actions">
+                <span class="status-badge idle" id="bfs-status">Sẵn sàng</span>
+                <button class="btn-card-zoom" data-algo="bfs" title="Phóng to thuật toán BFS">
+                  <span class="zoom-icon">⛶</span> <span class="zoom-text">Phóng to</span>
+                </button>
+              </div>
             </div>
-            <span class="status-badge idle" id="bfs-status">Sẵn sàng</span>
+            <div class="algo-subdesc">Tìm kiếm theo chiều rộng • Không tính trọng số</div>
+          </div>
+          <div class="algo-focus-banner bfs-banner">
+            <span>💡 <strong>Đặc tính BFS:</strong> Quét lan tỏa hình tròn theo từng lớp sóng (Hàng đợi FIFO). Đảm bảo tìm được đường đi ít bước nhất trên lưới không trọng số, nhưng hoàn toàn mù quáng trước bùn lầy & vực sâu.</span>
           </div>
           <div class="canvas-viewport">
             <canvas id="canvas-bfs"></canvas>
@@ -181,13 +234,21 @@
         </div>
 
         <!-- Dijkstra Viewport -->
-        <div class="algo-viewport-card dijkstra">
+        <div class="algo-viewport-card dijkstra" data-algo="dijkstra">
           <div class="viewport-header">
-            <div class="algo-title-wrap">
+            <div class="viewport-header-top">
               <span class="algo-badge dijkstra">DIJKSTRA</span>
-              <span class="algo-subdesc">Min-Heap • Tối ưu tổng chi phí</span>
+              <div class="viewport-actions">
+                <span class="status-badge idle" id="dijkstra-status">Sẵn sàng</span>
+                <button class="btn-card-zoom" data-algo="dijkstra" title="Phóng to thuật toán Dijkstra">
+                  <span class="zoom-icon">⛶</span> <span class="zoom-text">Phóng to</span>
+                </button>
+              </div>
             </div>
-            <span class="status-badge idle" id="dijkstra-status">Sẵn sàng</span>
+            <div class="algo-subdesc">Thuật toán Dijkstra • Tối ưu tổng chi phí đường đi</div>
+          </div>
+          <div class="algo-focus-banner dijkstra-banner">
+            <span>💡 <strong>Đặc tính Dijkstra:</strong> Quét thông minh dựa trên chi phí tích lũy g(n) qua Hàng đợi ưu tiên. Đảm bảo luôn tìm được đường có tổng trọng số thấp nhất, chủ động né bùn lầy & vực nước.</span>
           </div>
           <div class="canvas-viewport">
             <canvas id="canvas-dijkstra"></canvas>
@@ -195,13 +256,21 @@
         </div>
 
         <!-- A* Viewport -->
-        <div class="algo-viewport-card astar">
+        <div class="algo-viewport-card astar" data-algo="astar">
           <div class="viewport-header">
-            <div class="algo-title-wrap">
-              <span class="algo-badge astar">A* (A-STAR)</span>
-              <span class="algo-subdesc">Manhattan Heuristic • Tối ưu số ô duyệt</span>
+            <div class="viewport-header-top">
+              <span class="algo-badge astar">A*</span>
+              <div class="viewport-actions">
+                <span class="status-badge idle" id="astar-status">Sẵn sàng</span>
+                <button class="btn-card-zoom" data-algo="astar" title="Phóng to thuật toán A*">
+                  <span class="zoom-icon">⛶</span> <span class="zoom-text">Phóng to</span>
+                </button>
+              </div>
             </div>
-            <span class="status-badge idle" id="astar-status">Sẵn sàng</span>
+            <div class="algo-subdesc">Thuật toán A* • Định hướng Heuristic, duyệt ít ô nhất</div>
+          </div>
+          <div class="algo-focus-banner astar-banner">
+            <span>💡 <strong>Đặc tính A*:</strong> Kết hợp chi phí thực g(n) với hàm ước lượng khoảng cách Manhattan. Tia sóng quét định hướng thẳng về đích, tiết kiệm 60–80% số ô duyệt mà vẫn đảm bảo đường đi tối ưu.</span>
           </div>
           <div class="canvas-viewport">
             <canvas id="canvas-astar"></canvas>
@@ -216,43 +285,82 @@
     </section>
   </main>
 
-  <!-- Arcade Arena 3D View Container -->
+  <!-- Arcade Arena 3D View Container (Expanded Full-Screen Arena) -->
   <div class="arcade-view-container" id="arcade-view-container">
+    <!-- Arcade Top Banner: Mission & Controls -->
+    <div class="arcade-top-banner">
+      <div class="arcade-mission-card">
+        <div class="mission-icon">🎮</div>
+        <div>
+          <h3 class="mission-title">Đấu Trường 3D: Rượt Đuổi Mê Cung (Thử Thách AI)</h3>
+          <p class="mission-desc">
+            Nhiệm vụ: Điều khiển tác tử thu thập đủ <strong>3 Chìa Khóa Năng Lượng 🔑</strong> và trốn thoát qua <strong>Cổng Về Đích 🎯</strong> trước khi bị 3 AI thợ săn bắt kịp!
+          </p>
+        </div>
+      </div>
+      <div class="arcade-controls-guide">
+        <div class="guide-item">
+          <span class="key-badge">W</span><span class="key-badge">A</span><span class="key-badge">S</span><span class="key-badge">D</span> hoặc <span class="key-badge">↑</span><span class="key-badge">←</span><span class="key-badge">↓</span><span class="key-badge">→</span>
+          <span class="guide-text">Di chuyển</span>
+        </div>
+        <div class="guide-item">
+          <span class="key-badge space-badge">Space</span>
+          <span class="guide-text">Thả Bẫy Bùn (+5 bước cản AI)</span>
+        </div>
+        <div class="guide-item">
+          <span>🖱️</span>
+          <span class="guide-text">Kéo chuột: Xoay 3D | Cuộn: Thu/Phóng</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Arcade HUD -->
     <div class="arcade-hud">
-      <div class="hud-item">
-        <span>❤️ Sinh lực (HP):</span>
+      <div class="hud-item hp-item">
+        <span class="hud-label">❤️ Sinh lực (HP):</span>
         <div class="hp-bar-container">
           <div class="hp-bar-fill" id="hud-hp-bar"></div>
         </div>
-        <span id="hud-hp-text">100 / 100</span>
+        <span id="hud-hp-text" class="hud-value">100 / 100</span>
       </div>
 
       <div class="hud-item">
-        <span>🔑 Chìa khóa năng lượng:</span>
-        <span id="hud-keys-text" style="color: var(--neon-gold); font-weight: 700;">0 / 3</span>
+        <span class="hud-label">🔑 Chìa khóa:</span>
+        <span id="hud-keys-text" class="hud-value hud-keys">0 / 3</span>
       </div>
 
       <div class="hud-item">
-        <span>🛡️ Bẫy bùn cản đường (Space):</span>
-        <span id="hud-traps-text" style="color: var(--neon-cyan); font-weight: 700;">5 lượt</span>
+        <span class="hud-label">🛡️ Bẫy bùn cản AI:</span>
+        <span id="hud-traps-text" class="hud-value hud-traps">5 lượt</span>
       </div>
 
-      <div class="hud-item">
-        <button id="btn-arcade-restart" class="btn-secondary">
-          <span>🔄</span> Chơi lại Game
+      <!-- Enemy Radar Tracker -->
+      <div class="hud-enemies-tracker">
+        <span class="radar-label">📡 3 AI Thợ Săn:</span>
+        <span class="enemy-pill astar-enemy" title="A* AI: Đuổi theo đường ngắn nhất Heuristic">🔴 Thợ Săn A*</span>
+        <span class="enemy-pill dijkstra-enemy" title="Dijkstra AI: Tính toán chi phí, né bẫy bùn">🔵 Dijkstra</span>
+        <span class="enemy-pill bfs-enemy" title="BFS AI: Quét đều theo tầng sóng">🔷 BFS</span>
+      </div>
+
+      <div class="hud-item hud-actions-group">
+        <button id="btn-arcade-camera-reset" class="btn-arcade-secondary" title="Đặt lại góc nhìn 3D mặc định">
+          <span>🎥</span> Góc Nhìn Chuẩn
+        </button>
+        <button id="btn-arcade-restart" class="btn-arcade-restart" title="Tạo mới màn chơi ngẫu nhiên">
+          <span>🔄</span> Màn Chơi Mới
         </button>
       </div>
     </div>
 
-    <!-- 3D Game Canvas Area -->
+    <!-- 3D Game Canvas Area (Expanded Full Height) -->
     <div class="arcade-canvas-wrap" id="arcade-3d-container">
       <!-- Overlay Messages -->
       <div class="game-overlay-message" id="game-overlay">
-        <h2 class="game-overlay-title" id="game-overlay-title">VICTORY</h2>
-        <p id="game-overlay-desc" style="color: var(--text-secondary); max-width: 450px; text-align: center;">
+        <h2 class="game-overlay-title" id="game-overlay-title">CHIẾN THẮNG!</h2>
+        <p id="game-overlay-desc">
           Bạn đã thu thập đủ chìa khóa và thoát khỏi mê cung an toàn trước sự săn lùng của 3 AI!
         </p>
-        <button id="btn-overlay-action" class="btn-primary" style="margin-top: 1rem;">
+        <button id="btn-overlay-action" class="btn-race-primary" style="margin-top: 1rem;">
           Chơi lại màn mới
         </button>
       </div>
@@ -264,16 +372,16 @@
     <div class="modal-card">
       <div class="modal-header">
         <div class="modal-title">
-          <span>🧊</span> Không Gian 3D Voxel Tương Tác (Three.js WebGL Engine)
+          <span>🧊</span> Không Gian Sa Bàn 3D Trực Quan
         </div>
         <button class="modal-close-btn" id="btn-close-modal-3d">✕</button>
       </div>
       <div class="modal-body">
         <div class="modal-3d-canvas-container" id="modal-3d-viewport"></div>
         <div class="modal-3d-controls">
-          <button id="btn-cam-iso" class="btn-secondary">📐 Góc Isometric</button>
-          <button id="btn-cam-top" class="btn-secondary">⬆️ Góc Nhìn Từ Trên (Top-Down)</button>
-          <button id="btn-cam-reset" class="btn-secondary">🎯 Reset Góc Nhìn</button>
+          <button id="btn-cam-iso" class="btn-secondary">📐 Góc Nhìn Chéo 3D</button>
+          <button id="btn-cam-top" class="btn-secondary">⬆️ Góc Nhìn Từ Trên Xuống</button>
+          <button id="btn-cam-reset" class="btn-secondary">🎯 Đặt Lại Góc Nhìn</button>
         </div>
       </div>
     </div>
