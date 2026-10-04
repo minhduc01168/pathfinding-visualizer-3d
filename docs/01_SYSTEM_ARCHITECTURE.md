@@ -28,21 +28,21 @@
 Hệ thống được thiết kế theo nguyên lý **Decoupled Architecture (Phân tách Độc lập)**, chia thành 4 lớp rõ ràng:
 
 ```mermaid
-graph TD
-    subgraph UI_Layer["1. TẦNG GIAO DIỆN & TƯƠNG TÁC (Presentation & UX Layer)"]
+flowchart TD
+    subgraph UI_Layer["1. PRESENTATION & INTERACTION LAYER"]
         HTML["index.html (Semantic Structure)"]
-        CSS["Design System (Cyber Aurora & Crisp Light Theme)"]
+        CSS["Design System (STEM Crisp Light & Cyber Dark Themes)"]
         Toolbar["Control Toolbar & Brush Palette"]
         Dashboard["Telemetry & Automated Verdict Engine"]
     end
 
-    subgraph State_Layer["2. TẦNG ĐIỀU PHỐI TRẠNG THÁI (Application Orchestrator)"]
+    subgraph State_Layer["2. STATE ORCHESTRATION LAYER"]
         Main["main.ts (Global State Manager)"]
         GridState["Grid Data (rows, cols, nodes, start, end)"]
-        ModeSwitcher["Mode Switcher (Lab Mode <-> Arcade Mode)"]
+        ModeSwitcher["Mode Switcher (Lab Mode <-> 3D Arena)"]
     end
 
-    subgraph Engine_Layer["3. TẦNG LÕI THUẬT TOÁN (Core Algorithm & Math Engine)"]
+    subgraph Engine_Layer["3. CORE ALGORITHM & MATHEMATICS LAYER"]
         BFS["BFS Runner (FIFO Queue)"]
         Dijkstra["Dijkstra Runner (Min-Heap Priority Queue)"]
         AStar["A* Runner (f = g + h, Manhattan Heuristic)"]
@@ -51,9 +51,8 @@ graph TD
         MazeGen["Procedural Maze Generators (Recursive, Traps)"]
     end
 
-    subgraph Render_Layer["4. TẦNG KỸ THUẬT ĐỒ HỌA (Dual Rendering Pipeline)"]
+    subgraph Render_Layer["4. DUAL RENDERING PIPELINE LAYER"]
         Canvas2D["GridCanvas2D (HTML5 DPI-Scaled Canvas)"]
-        TriSplit["TriSplitView Manager (Synchronized Lockstep)"]
         ThreeEngine["ThreeEngine (Three.js WebGL 3D Voxel Engine)"]
         GameEngine3D["GameEngine3D (60 FPS Real-Time Game Loop)"]
     end

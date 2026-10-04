@@ -215,28 +215,28 @@ Hệ thống được thiết kế hướng tới 3 nhóm đối tượng mục 
 Hệ thống PathQuest 2D/3D phục vụ người dùng thông qua hai phân hệ chức năng tương ứng với hai chế độ hoạt động: Phân hệ Sa Bàn Nghiên Cứu và Phân hệ Đấu Trường 3D.
 
 ```mermaid
-graph TD
-    User(["👤 Người dùng / Học sinh / Giáo viên"])
+flowchart TD
+    User(["👤 User / Student / Instructor"])
 
-    subgraph System["HỆ THỐNG PATHQUEST 2D/3D"]
-        subgraph Lab_Module["Phân Hệ 1: Sa Bàn Đối Đầu Thuật Toán (Lab Benchmark)"]
-            UC1["UC-01: Biên tập Sa bàn & Vẽ Địa hình"]
-            UC2["UC-02: Sinh Mê cung & Bẫy trọng số"]
-            UC3["UC-03: Kích hoạt Chạy đua Song song 3 Thuật toán"]
-            UC4["UC-04: Phóng to Khảo sát Chuyên sâu Thuật toán"]
-            UC5["UC-05: Đọc Báo cáo Đối sánh & Đo lường Vi sai"]
+    subgraph System["PATHQUEST 2D/3D SYSTEM"]
+        subgraph Lab_Module["Subsystem 1: Algorithm Benchmark Lab"]
+            UC1["UC-01: Edit Terrain & Draw Obstacles"]
+            UC2["UC-02: Generate Procedural Mazes & Weighted Traps"]
+            UC3["UC-03: Run Concurrent 3-Algorithm Race"]
+            UC4["UC-04: Zoom & Focus Individual Algorithm"]
+            UC5["UC-05: Inspect Telemetry & Benchmark Analytics"]
         end
 
-        subgraph Arcade_Module["Phân Hệ 2: Đấu Trường 3D (AI Real-time Arena)"]
-            UC6["UC-06: Điều khiển Nhân vật trong Không gian 3D"]
-            UC7["UC-07: Giăng Bẫy Tường Thời gian thực"]
-            UC8["UC-08: Quan sát AI Tái định tuyến Động (Re-routing)"]
-            UC9["UC-09: Chuyển đổi Góc nhìn Camera 3D / Đỉnh đầu"]
+        subgraph Arcade_Module["Subsystem 2: Real-Time 3D Arena"]
+            UC6["UC-06: Control Player in 3D Space"]
+            UC7["UC-07: Place Real-Time Obstacle Traps"]
+            UC8["UC-08: Observe Dynamic AI Re-routing"]
+            UC9["UC-09: Switch Camera View (Isometric / Top-Down)"]
         end
 
-        subgraph Config_Module["Cấu hình & Tiện ích Chung"]
-            UC10["UC-10: Thay đổi Kích thước Lưới (Nhỏ/Chuẩn/Lớn)"]
-            UC11["UC-11: Chuyển đổi Giao diện Sáng / Tối"]
+        subgraph Config_Module["Configuration & Common Utilities"]
+            UC10["UC-10: Switch Grid Preset (25x15 / 35x21 / 50x30)"]
+            UC11["UC-11: Toggle Light / Dark Theme"]
         end
     end
 
@@ -252,9 +252,9 @@ graph TD
     User --> UC10
     User --> UC11
 
-    UC3 ..> UC5 : <<include>>
-    UC4 ..> UC3 : <<extend>>
-    UC7 ..> UC8 : <<trigger>>
+    UC3 -.->|include| UC5
+    UC4 -.->|extend| UC3
+    UC7 -.->|trigger| UC8
 ```
 *Hình 2.1: Biểu đồ ca sử dụng (Use Case) tổng quát hệ thống PathQuest 2D/3D.*
 
@@ -262,18 +262,18 @@ graph TD
 
 ##### Phân hệ Sa Bàn Nghiên cứu & Đối sánh Thuật toán
 ```mermaid
-graph TD
-    User(["👤 Người dùng"])
+flowchart TD
+    User(["👤 User"])
     
-    subgraph UC3_Detail["Phân rã UC-03: Chạy đua Song song 3 Thuật toán"]
-        UC3_1["Chuyển đổi dữ liệu Lưới sang Đồ thị có Trọng số"]
-        UC3_2["Khởi tạo Hàng đợi FIFO và chạy BFS"]
-        UC3_3["Khởi tạo Min-Heap và chạy Dijkstra"]
-        UC3_4["Khởi tạo Min-Heap kết hợp Manhattan và chạy A*"]
-        UC3_5["Phối hợp Hoạt họa Phân bước Đồng bộ (Lockstep Sync)"]
-        UC3_6["Vẽ Vệt Nhiệt Lan Sóng (Heatmap Trace)"]
-        UC3_7["Vẽ Đường Đi Tối Ưu Màu Vàng (Golden Path)"]
-        UC3_8["Cố định Trạng thái Kết thúc (Trace Persistence)"]
+    subgraph UC3_Detail["UC-03 Breakdown: Concurrent Algorithm Benchmark"]
+        UC3_1["Convert Grid Matrix to Weighted Graph"]
+        UC3_2["Initialize FIFO Queue and Execute BFS"]
+        UC3_3["Initialize Min-Heap and Execute Dijkstra"]
+        UC3_4["Initialize Min-Heap with Manhattan and Execute A*"]
+        UC3_5["Synchronize Lockstep Animation Timer"]
+        UC3_6["Render Wavefront Heatmap Traces"]
+        UC3_7["Render Optimal Golden Path"]
+        UC3_8["Persist Final State & Retain Traces"]
     end
 
     User --> UC3_1
@@ -319,66 +319,71 @@ graph TD
 
 #### 2.2.1. Quy trình Đồng bộ Sa bàn và Đua song song 3 Thuật toán
 ```mermaid
-stateDiagram-v2
-    [*] --> ChinhSuaSaBan: Người dùng vẽ vật cản / chọn mẫu mê cung
-    ChinhSuaSaBan --> DongBoDuLieu: Sự kiện vẽ kết thúc
-    DongBoDuLieu --> BamChayDua: Ma trận lưới Master đồng bộ xuống 3 Canvas phụ
-    BamChayDua --> KhoaGiaoDien: Nhấn "CHẠY ĐUA TẤT CẢ"
-    KhoaGiaoDien --> ChayThuatToanRAM: Clone 3 ma trận độc lập
+flowchart TD
+    Start([Start]) --> EditGrid["User edits terrain / selects maze generator"]
+    EditGrid --> SyncData["Auto-sync master grid to 3 viewport canvases"]
+    SyncData --> ClickRace["User clicks 'RACE ALL ALGORITHMS'"]
+    ClickRace --> LockUI["Lock interactive drawing controls"]
+    LockUI --> CloneGrid["Clone 3 independent node matrices in RAM"]
     
-    state ChayThuatToanRAM {
-        [*] --> ChayBFS
-        [*] --> ChayDijkstra
-        [*] --> ChayAStar
-        ChayBFS --> ThuThapKetQua: FIFO Queue
-        ChayDijkstra --> ThuThapKetQua: Min-Heap Relaxation
-        ChayAStar --> ThuThapKetQua: Min-Heap + Manhattan Heuristic
-    }
+    subgraph RAM_Execution["In-Memory Concurrent Computation (< 5ms)"]
+        direction TB
+        CloneGrid --> RunBFS["Execute BFS (FIFO Queue)"]
+        CloneGrid --> RunDijkstra["Execute Dijkstra (Min-Heap Relaxation)"]
+        CloneGrid --> RunAStar["Execute A* (Min-Heap + Manhattan Heuristic)"]
+        RunBFS --> CollectRes["Collect Search Results (visitedOrder, shortestPath, metrics)"]
+        RunDijkstra --> CollectRes
+        RunAStar --> CollectRes
+    end
 
-    ThuThapKetQua --> KichHoatHoatHoa: Trả về visitedOrder & shortestPath
+    CollectRes --> AnimLoop["Start Lockstep Animation Loop (requestAnimationFrame)"]
     
-    state KichHoatHoatHoa {
-        [*] --> VeBuocSongDongThoi: Lockstep Timer Step
-        VeBuocSongDongThoi --> KiemTraHoanTat: Vẽ sóng trên 3 Canvas
-        KiemTraHoanTat --> VeBuocSongDongThoi: Còn ô chưa duyệt
-        KiemTraHoanTat --> VeDuongDiVang: Đã duyệt xong / Chạm đích
-    }
+    subgraph Animation["Synchronized Lockstep Visualization"]
+        direction TB
+        AnimLoop --> StepFrontier["Render expansion wave on all 3 viewports"]
+        StepFrontier --> CheckDone{"Any frontier remaining?"}
+        CheckDone -- Yes --> StepFrontier
+        CheckDone -- No / Goal Reached --> DrawGolden["Render glowing Golden Path"]
+    end
 
-    VeDuongDiVang --> LuuVetVinhVien: Giữ nguyên Heatmap & Golden Path
-    LuuVetVinhVien --> XuatBaoCaoTelemetry: Cập nhật chỉ số vi sai & kết luận
-    XuatBaoCaoTelemetry --> MoKhoaGiaoDien: Chuyển nút về "CHẠY ĐUA TẤT CẢ"
-    MoKhoaGiaoDien --> [*]
+    DrawGolden --> TracePersist["Retain Heatmap and Path Traces Permanently"]
+    TracePersist --> UpdateTelemetry["Update Telemetry Dashboard & Comparative Verdict"]
+    UpdateTelemetry --> UnlockUI["Reset Button to 'RACE ALL' (Ready)"]
+    UnlockUI --> End([End])
 ```
 *Hình 2.4: Biểu đồ hoạt động: Quy trình Đồng bộ Sa bàn và Chạy đua song song 3 Thuật toán.*
 
 #### 2.2.2. Quy trình Đấu trường 3D Rượt đuổi AI Thời gian thực
 ```mermaid
-stateDiagram-v2
-    [*] --> KhoiTaoDauTruong3D: Chuyển tab "Đấu Trường 3D"
-    KhoiTaoDauTruong3D --> BuildVoxelWorld: Dựng sa bàn Voxel WebGL Three.js
-    BuildVoxelWorld --> StartGameLoop: Khởi động vòng lặp Game Loop 60 FPS
+flowchart TD
+    Start([Start]) --> SwitchArcade["Switch to '3D Arena' Tab"]
+    SwitchArcade --> BuildVoxel["Build Three.js WebGL Voxel Arena"]
+    BuildVoxel --> StartGameLoop["Start 60 FPS Game Loop"]
     
-    state StartGameLoop {
-        [*] --> LangNghePhim: Bắt sự kiện phím W, A, S, D
-        LangNghePhim --> DiChuyenNguoiChoi: Cập nhật vị trí Player trong lưới
-        DiChuyenNguoiChoi --> KiemTraDatBay: Người chơi bấm phím Space đặt Tường
-        KiemTraDatBay --> DatTuong3D: Thêm Wall Voxel vào ma trận vật lý
-        DatTuong3D --> TriggerAIReroute: Kích hoạt ngắt AI tính lại đường
+    subgraph GameLoop["Real-Time 60 FPS Game Loop"]
+        direction TB
+        StartGameLoop --> ListenInput["Listen for W, A, S, D Key Inputs"]
+        ListenInput --> MovePlayer["Update Player Position on Grid"]
+        MovePlayer --> CheckTrap{"Player pressed Space (Drop Trap)?"}
         
-        state AI_Update {
-            TriggerAIReroute --> ChayAStarRealTime: A* tính đường từ AI tới Player
-            ChayAStarRealTime --> DiChuyenAI: AI bước 1 ô theo đường mới
-        }
+        CheckTrap -- Yes --> PlaceWall["Spawn Voxel Wall in Physics Matrix"]
+        PlaceWall --> TriggerReroute["Trigger Immediate AI Re-routing Event"]
+        CheckTrap -- No --> UpdateHunter["Update AI Hunter Position"]
 
-        DiChuyenAI --> KiemTraVaCham: Tính khoảng cách Euclidean
-        KiemTraVaCham --> XuLyBatDau: Khoảng cách < 0.5 (AI bắt được Player)
-        KiemTraVaCham --> KiemTraVeDich: Player chạm cổng Goal
-    }
+        subgraph AI_Subsystem["Dynamic AI Re-Routing Subsystem"]
+            TriggerReroute --> RunAStarLive["Run Real-Time A* Search from Hunter to Player"]
+            RunAStarLive --> UpdateHunter
+        end
 
-    XuLyBatDau --> ManHinhThua: Thất bại! AI đã bắt kịp bạn
-    KiemTraVeDich --> ManHinhThang: CHIẾN THẮNG! Về đích an toàn
-    ManHinhThua --> [*]
-    ManHinhThang --> [*]
+        UpdateHunter --> CheckCollision{"Distance <= 0.5?"}
+        CheckCollision -- Yes --> GameOverLose["Defeat! Hunter captured Player"]
+        CheckCollision -- No --> CheckGoal{"Player reached Goal Portal?"}
+        CheckGoal -- Yes --> GameOverWin["Victory! Goal safely reached"]
+        CheckGoal -- No --> ListenInput
+    end
+
+    GameOverLose --> EndLose([End - Game Over Screen])
+    GameOverWin --> EndWin([End - Victory Screen])
 ```
 *Hình 2.6: Biểu đồ hoạt động: Luồng Tái định tuyến Động (Dynamic Re-routing) trong Đấu trường 3D.*
 
@@ -390,43 +395,43 @@ stateDiagram-v2
 ```mermaid
 sequenceDiagram
     autonumber
-    actor User as Người dùng
-    participant UI as Giao diện (index.html)
-    participant Main as Bộ điều phối (main.ts)
-    participant Core as Lõi Thuật toán (BFS/Dijkstra/A*)
+    actor User as User
+    participant UI as Web UI (index.html)
+    participant Main as Orchestrator (main.ts)
+    participant Core as Algorithm Engine (BFS / Dijkstra / A*)
     participant Heap as Binary Min-Heap
-    participant Render as GridCanvas2D (3 Canvases)
-    participant Dash as Bảng Đo Lường (Dashboard.ts)
+    participant Render as GridCanvas2D (3 Viewports)
+    participant Dash as Dashboard Component
 
-    User->>UI: Nhấn nút "CHẠY ĐUA TẤT CẢ"
+    User->>UI: Click "RACE ALL ALGORITHMS"
     UI->>Main: triggerRaceAll()
-    Main->>UI: setRaceButtonState(Running)
+    Main->>UI: setRaceButtonState("Running...")
     
-    par Luồng tính toán BFS
+    par BFS Computation
         Main->>Core: runBFS(gridClone, start, end)
         Core-->>Main: SearchResult (visitedOrder, shortestPath, metrics)
-    and Luồng tính toán Dijkstra
+    and Dijkstra Computation
         Main->>Core: runDijkstra(gridClone, start, end)
-        Core->>Heap: push / pop relaxation
+        Core->>Heap: push / pop relaxation O(log V)
         Core-->>Main: SearchResult (visitedOrder, shortestPath, metrics)
-    and Luồng tính toán A*
+    and A* Computation
         Main->>Core: runAStar(gridClone, start, end)
-        Core->>Heap: push / pop fScore (g + Manhattan)
+        Core->>Heap: push / pop fScore with Manhattan O(log V)
         Core-->>Main: SearchResult (visitedOrder, shortestPath, metrics)
     end
 
     Main->>Dash: updateMetrics(bfsResult, dijkstraResult, astarResult)
-    Dash->>UI: Hiển thị bảng đối sánh và kết luận tự động
+    Dash->>UI: Render comparative analytics & automated verdict
 
-    loop Từng khung hình hoạt họa (Lockstep Animation Loop)
+    loop Lockstep Animation Loop (Step-by-step)
         Main->>Render: renderStep(bfsCoord, dijkstraCoord, astarCoord)
-        Render->>Render: Tô màu ô sóng duyệt (Wavefront Heatmap)
+        Render->>Render: Paint wavefront heatmaps simultaneously
     end
 
     Main->>Render: renderGoldenPath(shortestPath)
-    Render->>Render: Vẽ đường đi vàng phát sáng vĩnh viễn
-    Main->>UI: setRaceButtonState(Completed)
-    UI-->>User: Hiển thị hoàn tất mô phỏng (Trace Persistent)
+    Render->>Render: Draw permanent glowing golden path
+    Main->>UI: setRaceButtonState("Completed")
+    UI-->>User: Simulation completed with persistent traces
 ```
 *Hình 2.8: Biểu đồ tuần tự: Vòng đời Thực thi Mô phỏng Song song và Lưu vết Vĩnh viễn.*
 
@@ -440,32 +445,32 @@ sequenceDiagram
 Hệ thống được tổ chức theo kiến trúc phân tầng phi tập trung (Decoupled Clean Architecture), đảm bảo tính cô lập tuyệt đối giữa logic thuật toán thuần túy và tầng hiển thị đồ họa.
 
 ```mermaid
-graph TD
-    subgraph Layer1["1. TẦNG TRÌNH DIỄN & TƯƠNG TÁC (Presentation & UX Layer)"]
-        HTML["index.html (Semantic Structure, ARIA Labels)"]
+flowchart TD
+    subgraph Layer1["1. PRESENTATION & INTERACTION LAYER"]
+        HTML["index.html (Semantic Layout & ARIA Tags)"]
         CSS["Design System (STEM Crisp Light & Cyber Dark Themes)"]
-        Toolbar["Thanh Công Cụ Studio 2 Cột (Cọ vẽ & Sinh mê cung)"]
-        ZoomTabs["Bộ lọc Tab Phóng to (Cả 3 / BFS / Dijkstra / A*)"]
-        Dashboard["Bảng Đo Lường Vi Sai & Kết Luận Khoa Học Tự Động"]
+        Toolbar["Studio 2-Column Controls (Brushes & Maze Selectors)"]
+        ZoomTabs["Zoom Filter Tabs (All 3 / BFS / Dijkstra / A*)"]
+        Dashboard["Telemetry Engine & Automated Verdict Reporter"]
     end
 
-    subgraph Layer2["2. TẦNG ĐIỀU PHỐI TRẠNG THÁI (State Orchestrator Layer)"]
+    subgraph Layer2["2. STATE ORCHESTRATION LAYER"]
         Main["main.ts (Global Application Controller)"]
-        GridState["Ma trận Lưới Đa Trọng Số (Grid Data Model)"]
-        ModeManager["Bộ Chuyển Đổi Chế Độ (Sa Bàn Lab <-> Đấu Trường 3D)"]
-        LockstepEngine["Bộ Điều Tốc Hoạt Họa Đồng Bộ (Lockstep Sync Engine)"]
+        GridState["Multi-Weighted Matrix (Grid Data Model)"]
+        ModeManager["Mode Switcher (Lab Benchmark <-> 3D Arena)"]
+        LockstepEngine["Lockstep Synchronization Engine"]
     end
 
-    subgraph Layer3["3. TẦNG LÕI GIẢI THUẬT & TOÁN HỌC (Core Math & Algorithms)"]
+    subgraph Layer3["3. CORE ALGORITHM & MATHEMATICS LAYER"]
         BFS["BFS Engine (FIFO Queue)"]
         Dijkstra["Dijkstra Engine (Min-Heap Relaxation)"]
-        AStar["A* Engine (f = g + h, Manhattan)"]
-        MinHeap["Cấu trúc Dữ liệu Binary Min-Heap Priority Queue"]
-        Heuristics["Thư viện Heuristic (Manhattan, Euclidean, Octile)"]
-        MazeGen["Bộ Sinh Mê Cung Thủ Tục (Recursive DFS, Division, Traps)"]
+        AStar["A* Engine (f = g + h, Manhattan Heuristic)"]
+        MinHeap["Binary Min-Heap Priority Queue Data Structure"]
+        Heuristics["Heuristic Library (Manhattan, Euclidean, Octile)"]
+        MazeGen["Procedural Maze Engine (Recursive DFS, Division, Traps)"]
     end
 
-    subgraph Layer4["4. TẦNG KỸ THUẬT ĐỒ HỌA KÉP (Dual Rendering Pipeline)"]
+    subgraph Layer4["4. DUAL RENDERING PIPELINE LAYER"]
         Canvas2D["GridCanvas2D (HTML5 DPI-Scaled Canvas Renderer)"]
         ThreeEngine["ThreeEngine (Three.js WebGL 3D Voxel Renderer)"]
         GameEngine3D["GameEngine3D (60 FPS Real-Time Physics & Collision)"]
@@ -507,16 +512,16 @@ classDiagram
         +GridNode parent
     }
 
-    class MinHeap~T~ {
-        -HeapItem~T~[] heap
+    class MinHeap {
+        -HeapItem[] heap
         +number size
         +isEmpty() boolean
-        +push(data: T, score: number) void
-        +pop() T
-        +peek() T
+        +push(data, score) void
+        +pop() Object
+        +peek() Object
         +clear() void
-        -bubbleUp(index: number) void
-        -sinkDown(index: number) void
+        -bubbleUp(index) void
+        -sinkDown(index) void
     }
 
     class GridCanvas2D {
@@ -526,12 +531,12 @@ classDiagram
         -number cols
         -GridCoord start
         -GridCoord end
-        -Set~string~ visitedSet
-        -Set~string~ pathSet
-        +resize(containerWidth: number) void
+        -Set visitedSet
+        -Set pathSet
+        +resize(containerWidth) void
         +draw() void
-        +setVisited(r: number, c: number) void
-        +setPath(path: GridCoord[]) void
+        +setVisited(r, c) void
+        +setPath(path) void
         +clearTraces() void
     }
 
@@ -543,12 +548,12 @@ classDiagram
         -Mesh hunterMesh
         -GridCoord playerPos
         -GridCoord hunterPos
-        +init(container: HTMLElement) void
-        +buildVoxelMaze(grid: NodeType[][]) void
-        +updatePlayerPos(dir: Direction) void
+        +init(container) void
+        +buildVoxelMaze(grid) void
+        +updatePlayerPos(dir) void
         +updateHunterStep() void
         +rerouteHunter() void
-        +setLightingMode(isDark: boolean) void
+        +setLightingMode(isDark) void
         -animate() void
     }
 
@@ -562,9 +567,9 @@ classDiagram
         +boolean isSuccess
     }
 
-    MinHeap ..> GridNode : quản lý ưu tiên
-    GridCanvas2D ..> GridNode : hiển thị trạng thái
-    GameEngine3D ..> GridNode : chuyển đổi tọa độ Voxel
+    MinHeap ..> GridNode : manages priority
+    GridCanvas2D ..> GridNode : renders state
+    GameEngine3D ..> GridNode : projects voxel coordinates
 ```
 *Hình 3.2: Sơ đồ Lớp Chi tiết: Mối quan hệ giữa Cấu trúc dữ liệu và Tầng Đồ họa.*
 
