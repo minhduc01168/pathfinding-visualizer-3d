@@ -562,15 +562,15 @@ Lưới được mô hình hóa thành đồ thị có hướng $G = (V, E)$: m�
 
 #### 3.3.4. Chứng minh: tính Admissible và Consistent của heuristic
 
-**Định nghĩa 1 (Admissible).** $h$ là *admissible* nếu $0 \le h(n) \le h^*(n)$ với mọi $n$, trong đó $h^*(n)$ là chi phí tối ưu thực từ $n$ đến đích $E$.
+**Định nghĩa 1 (Admissible).** $h$ là *admissible* nếu $0 \le h(n) \le h^{\ast}(n)$ với mọi $n$, trong đó $h^{\ast}(n)$ là chi phí tối ưu thực từ $n$ đến đích $E$.
 
 **Định lý 1.** Nếu $h$ admissible và mọi trọng số cạnh $\ge 1$ (đồ thị hữu hạn), A\* (dạng tìm kiếm trên đồ thị với tập mở) trả về đường đi tối ưu.
 
-*Chứng minh.* Giả sử A\* dừng khi lấy đích $E$ ra khỏi Min-Heap với $g(E) = C > C^*$, trong đó $C^*$ là chi phí tối ưu. Vì $h(E)=0$ nên $f(E) = C$.
+*Chứng minh.* Giả sử A\* dừng khi lấy đích $E$ ra khỏi Min-Heap với $g(E) = C > C^{\ast}$, trong đó $C^{\ast}$ là chi phí tối ưu. Vì $h(E)=0$ nên $f(E) = C$.
 
-Xét một đường đi tối ưu $S = n_0, n_1, \dots, n_k = E$. Gọi $n'$ là đỉnh *đầu tiên* trên đường này còn nằm trong tập mở. Đỉnh này tồn tại vì $n_0 = S$ đã được mở rộng và $E$ chưa được mở rộng. Do $n'$ là đỉnh đầu tiên chưa mở rộng nên tiền bối $n_{i-1}$ đã được mở rộng, và khi mở rộng nó đã gán $g(n') \le g(n_{i-1}) + w(n_{i-1}, n')$. Bằng quy nạp dọc theo đường tối ưu, $g(n') = g^*(n')$. Do đó:
-$$f(n') = g^*(n') + h(n') \le g^*(n') + h^*(n') = C^*$$
-Vì $C^* < C = f(E)$ nên $f(n') < f(E)$. Min-Heap luôn lấy phần tử có $f$ nhỏ nhất, nên $n'$ phải được lấy ra trước $E$ và $E$ không thể được lấy ra với $f(E)=C$. Điều này mâu thuẫn, suy ra $C = C^*$. $\blacksquare$
+Xét một đường đi tối ưu $S = n_0, n_1, \dots, n_k = E$. Gọi $n'$ là đỉnh *đầu tiên* trên đường này còn nằm trong tập mở. Đỉnh này tồn tại vì $n_0 = S$ đã được mở rộng và $E$ chưa được mở rộng. Do $n'$ là đỉnh đầu tiên chưa mở rộng nên tiền bối $n_{i-1}$ đã được mở rộng, và khi mở rộng nó đã gán $g(n') \le g(n_{i-1}) + w(n_{i-1}, n')$. Bằng quy nạp dọc theo đường tối ưu, $g(n') = g^{\ast}(n')$. Do đó:
+$$f(n') = g^{\ast}(n') + h(n') \le g^{\ast}(n') + h^{\ast}(n') = C^{\ast}$$
+Vì $C^{\ast} < C = f(E)$ nên $f(n') < f(E)$. Min-Heap luôn lấy phần tử có $f$ nhỏ nhất, nên $n'$ phải được lấy ra trước $E$ và $E$ không thể được lấy ra với $f(E)=C$. Điều này mâu thuẫn, suy ra $C = C^{\ast}$. $\blacksquare$
 
 **Định nghĩa 2 (Consistent).** $h$ là *consistent* (đơn điệu) nếu với mọi cặp đỉnh kề $n, n'$:
 $$h(n) \le w(n, n') + h(n'), \qquad h(E) = 0$$
